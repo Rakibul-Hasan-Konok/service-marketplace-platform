@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body { @apply bg-slate-50 text-slate-900; }
+.input { @apply w-full rounded-md border border-slate-300 px-3 py-2; }
+.btn { @apply inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:opacity-50; }
+.card { @apply rounded-lg border bg-white p-5 shadow-sm; }
+.badge { @apply rounded-full px-2 py-1 text-xs font-semibold; }

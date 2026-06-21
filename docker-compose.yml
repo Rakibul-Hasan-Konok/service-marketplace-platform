@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: service_marketplace_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: marketplace
+      POSTGRES_PASSWORD: marketplace
+      POSTGRES_DB: service_marketplace
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marketplace -d service_marketplace"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: service_marketplace_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://marketplace:marketplace@postgres:5432/service_marketplace
+      JWT_SECRET: super-secret-key-change-me
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:3000
+      PORT: 4000
+    ports:
+      - "4000:4000"
+      - "5556:5556"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: service_marketplace_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+      INTERNAL_API_URL: http://backend:4000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
